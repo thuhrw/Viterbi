@@ -20,8 +20,10 @@ def process_word1(word1: Dict):
     for pinyin, item in word1.items():
         count_list = item["counts"]
         total_count = sum(count_list)
+        if pinyin not in freq1:
+            freq1[pinyin] = {}
         for idx, character in enumerate(item["words"]):
-            freq1[character] = count_list[idx] / total_count
+            freq1[pinyin][character] = count_list[idx] / total_count
     return freq1
 
 
@@ -55,5 +57,5 @@ if __name__ == "__main__":
     word2 = read_twofreq()
     freq1 = process_word1(word1)
     freq2 = process_word2(word2)
-    print(json.dumps(freq1, ensure_ascii=False))
-    print(json.dumps(freq2, ensure_ascii=False))
+    # print(json.dumps(freq1, ensure_ascii=False))
+    # print(json.dumps(freq2, ensure_ascii=False))
