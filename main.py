@@ -1,9 +1,11 @@
 import json
 from typing import Dict
 import os
-import pathlib
-from tqdm import tqdm
 import sys
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+import time
 
 
 def is_chinese_char(character):
@@ -33,10 +35,11 @@ def pinyin():
                 dictionary[pinyin].append(character)
     return dictionary
 
+
 def word_process1(path: str):
     """处理一元字的个数和概率"""
     char_count = {}
-    for filename in tqdm(os.listdir(path)):
+    for filename in os.listdir(path):
         if filename == "README.txt":
             continue
         with open(os.path.join(path, filename), "r", encoding="gbk") as f:
@@ -61,7 +64,7 @@ def word_process1(path: str):
 def word_process2(path: str, cnt1):
     """处理二元字的个数与概率"""
     pair_count = {}
-    for filename in tqdm(os.listdir(path)):
+    for filename in os.listdir(path):
         if filename == "README.txt":
             continue
         with open(os.path.join(path, filename), "r", encoding="gbk") as f:
@@ -104,6 +107,7 @@ class Node:
 
 
 delta = 1e-10
+# m = 0.87
 
 
 def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
@@ -141,6 +145,7 @@ def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
                 character1 = node.character
                 query = character1 + " " + character2
                 if query in freq2:
+                    # probaccu = node.probaccu * (m * freq2[query] +(1-m) * freq1[character2])
                     probaccu = node.probaccu * freq2[query]
                     if probaccu > max_prob:
                         max_prob = probaccu
@@ -176,6 +181,7 @@ def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
 
 
 def main():
+    # start = time.time()
     dictionary = pinyin()
     # corpus_folder_path = "./corpus/sina_news_gbk"
     # cnt1, freq1 = word_process1(corpus_folder_path)
@@ -192,7 +198,13 @@ def main():
     # temp_saving_path = "./word_freq2.json"
     # with open(temp_saving_path, "w", encoding="utf-8") as f:
     #     json.dump(freq2, f, ensure_ascii=False, indent=4)
-    
+
+    # end = time.time()
+    # elapsed= end - start
+    # print(f"初始化耗时：{elapsed:.2f} 秒")
+    # print(sys.getsizeof(freq1))
+    # print(sys.getsizeof(freq2))
+
     with open("./word_freq1.json", "r", encoding="utf-8") as f:
         freq1 = json.load(f)
     with open("./word_freq2.json", "r", encoding="utf-8") as f:
@@ -201,9 +213,13 @@ def main():
         cnt1 = json.load(f)
     with open("./word_cnt2.json", "r", encoding="utf-8") as f:
         cnt2 = json.load(f)
+    # start = time.time()
     for idx, pinyin_sequence in enumerate(sys.stdin):
         ans = viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1)
         print(ans)
+    # end = time.time()
+    # elapsed = end - start
+    # print(f"测试耗时：{elapsed:.2f} 秒")
 
 
 if __name__ == "__main__":
