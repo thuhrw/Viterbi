@@ -207,7 +207,9 @@ class Node:
         self.prev = prev
 
 
-delta = 1e-10
+delta_word = 1e-7
+delta_char = 1e-10
+m = 0.80
 
 
 def viterbi(
@@ -224,7 +226,7 @@ def viterbi(
     zhuyin,
 ):
     """viterbi算法实现"""
-    global delta
+    global delta_word, delta_char, m
     pinyin_sequence = pinyin_sequence.strip().split()
     length = len(pinyin_sequence)
     dps = []
@@ -244,14 +246,13 @@ def viterbi(
             for item in zhuyin[word_pinyin]:
                 dps[len(item) - 1].append(Node(item, word_freq1[item], None))
                 append_cnt += 1
-    if append_cnt == 0:
+    if dps[0] == []:
         for word in dictionary.get(pinyin_sequence[0]):
             if word in char_freq1.keys():
                 dps[0].append(Node(word, char_freq1[word], None))
 
     # next
     for idx in range(1, length):
-        append_cnt = 0
         for i in range(0, min(max_word_length, (length - idx))):
             word_pinyin = pinyin_sequence[idx]
             if i >= 1:
@@ -266,12 +267,16 @@ def viterbi(
                         character1 = node.character
                         query = character1 + " " + character2
                         if query in word_freq2:
-                            prob = node.prob * word_freq2[query]
+                            prob = node.prob * (
+                                m * word_freq2[query] + (1 - m) * word_freq1[character2]
+                            )
                             if prob > max_prob:
                                 max_prob = prob
                                 prev_node = node
                         else:
-                            prob = node.prob * delta
+                            prob = node.prob * (
+                                m * delta_word + (1 - m) * word_freq1[character2]
+                            )
                             if prob > max_prob:
                                 max_prob = prob
                                 prev_node = node
@@ -279,9 +284,8 @@ def viterbi(
                     dps[idx + len(character2) - 1].append(
                         Node(character2, max_prob, prev_node)
                     )
-                    append_cnt += 1
 
-        if append_cnt == 0:
+        if dps[idx] == []:
             for character2 in dictionary.get(pinyin_sequence[idx]):
                 if character2 not in char_freq1:
                     continue
@@ -291,12 +295,16 @@ def viterbi(
                     character1 = node.character[-1]
                     query = character1 + " " + character2
                     if query in char_freq2:
-                        prob = node.prob * char_freq2[query]
+                        prob = node.prob * (
+                            m * char_freq2[query] + (1 - m) * char_freq1[character2]
+                        )
                         if prob > max_prob:
                             max_prob = prob
                             prev_node = node
                     else:
-                        prob = node.prob * delta
+                        prob = node.prob * (
+                            m * delta_char + (1 - m) * char_freq1[character2]
+                        )
                         if prob > max_prob:
                             max_prob = prob
                             prev_node = node
@@ -329,66 +337,66 @@ def viterbi(
 
 def main():
     corpus_folder_path = "./corpus/sina_news_gbk"
-    start = time.time()
-    dictionary = get_pinyin()
+    # start = time.time()
+    # dictionary = get_pinyin()
 
-    char_cnt1, char_freq1 = char_process1(corpus_folder_path)
+    # char_cnt1, char_freq1 = char_process1(corpus_folder_path)
 
-    char_cnt2, char_freq2 = char_process2(corpus_folder_path, char_cnt1)
+    # char_cnt2, char_freq2 = char_process2(corpus_folder_path, char_cnt1)
 
-    word_cnt1, word_freq1, zhuyin = word_process1(corpus_folder_path)
+    # word_cnt1, word_freq1, zhuyin = word_process1(corpus_folder_path)
 
-    word_cnt2, word_freq2 = word_process2(corpus_folder_path, word_cnt1)
+    # word_cnt2, word_freq2 = word_process2(corpus_folder_path, word_cnt1)
 
-    end = time.time()
-    elapsed = end - start
-    print(f"初始化耗时：{elapsed:.2f} 秒")
+    # end = time.time()
+    # elapsed = end - start
+    # print(f"初始化耗时：{elapsed:.2f} 秒")
 
-    save_to_json(dictionary, "./saved_data/pinyin_char_dict.json")
-    save_to_json(char_cnt1, "./saved_data/char_count.json")
-    save_to_json(char_freq1, "./saved_data/char_frequency.json")
-    save_to_json(char_cnt2, "./saved_data/char_pair_count.json")
-    save_to_json(char_freq2, "./saved_data/char_pair_frequency.json")
-    save_to_json(word_cnt1, "./saved_data/word_count.json")
-    save_to_json(word_freq1, "./saved_data/word_frequency.json")
-    save_to_json(zhuyin, "./saved_data/pinyin_word_dict.json")
-    save_to_json(word_cnt2, "./saved_data/word_pair_count.json")
-    save_to_json(word_freq2, "./saved_data/word_pair_frequency.json")
+    # save_to_json(dictionary, "./saved_data/pinyin_char_dict.json")
+    # save_to_json(char_cnt1, "./saved_data/char_count.json")
+    # save_to_json(char_freq1, "./saved_data/char_frequency.json")
+    # save_to_json(char_cnt2, "./saved_data/char_pair_count.json")
+    # save_to_json(char_freq2, "./saved_data/char_pair_frequency.json")
+    # save_to_json(word_cnt1, "./saved_data/word_count.json")
+    # save_to_json(word_freq1, "./saved_data/word_frequency.json")
+    # save_to_json(zhuyin, "./saved_data/pinyin_word_dict.json")
+    # save_to_json(word_cnt2, "./saved_data/word_pair_count.json")
+    # save_to_json(word_freq2, "./saved_data/word_pair_frequency.json")
 
-    # data_path = "./saved_data/"
-    # # 1. 拼音-汉字字典
-    # with open(data_path + "pinyin_char_dict.json", "r", encoding="utf-8") as f:
-    #     dictionary = json.load(f)
+    data_path = "./saved_data/"
+    # 1. 拼音-汉字字典
+    with open(data_path + "pinyin_char_dict.json", "r", encoding="utf-8") as f:
+        dictionary = json.load(f)
 
-    # # 2. 一元字
-    # with open(data_path + "char_count.json", "r", encoding="utf-8") as f:
-    #     char_cnt1 = json.load(f)
-    # with open(data_path + "char_frequency.json", "r", encoding="utf-8") as f:
-    #     char_freq1 = json.load(f)
+    # 2. 一元字
+    with open(data_path + "char_count.json", "r", encoding="utf-8") as f:
+        char_cnt1 = json.load(f)
+    with open(data_path + "char_frequency.json", "r", encoding="utf-8") as f:
+        char_freq1 = json.load(f)
 
-    # # 3. 二元字
-    # with open(data_path + "char_pair_count.json", "r", encoding="utf-8") as f:
-    #     char_cnt2 = json.load(f)
-    # with open(data_path + "char_pair_frequency.json", "r", encoding="utf-8") as f:
-    #     char_freq2 = json.load(f)
+    # 3. 二元字
+    with open(data_path + "char_pair_count.json", "r", encoding="utf-8") as f:
+        char_cnt2 = json.load(f)
+    with open(data_path + "char_pair_frequency.json", "r", encoding="utf-8") as f:
+        char_freq2 = json.load(f)
 
-    # # 4. 一元词
-    # with open(data_path + "word_count.json", "r", encoding="utf-8") as f:
-    #     word_cnt1 = json.load(f)
-    # with open(data_path + "word_frequency.json", "r", encoding="utf-8") as f:
-    #     word_freq1 = json.load(f)
+    # 4. 一元词
+    with open(data_path + "word_count.json", "r", encoding="utf-8") as f:
+        word_cnt1 = json.load(f)
+    with open(data_path + "word_frequency.json", "r", encoding="utf-8") as f:
+        word_freq1 = json.load(f)
 
-    # # 5. 拼音-词语映射
-    # with open(data_path + "pinyin_word_dict.json", "r", encoding="utf-8") as f:
-    #     zhuyin = json.load(f)
+    # 5. 拼音-词语映射
+    with open(data_path + "pinyin_word_dict.json", "r", encoding="utf-8") as f:
+        zhuyin = json.load(f)
 
-    # # 6. 二元词
-    # with open(data_path + "word_pair_count.json", "r", encoding="utf-8") as f:
-    #     word_cnt2 = json.load(f)
-    # with open(data_path + "word_pair_frequency.json", "r", encoding="utf-8") as f:
-    #     word_freq2 = json.load(f)
+    # 6. 二元词
+    with open(data_path + "word_pair_count.json", "r", encoding="utf-8") as f:
+        word_cnt2 = json.load(f)
+    with open(data_path + "word_pair_frequency.json", "r", encoding="utf-8") as f:
+        word_freq2 = json.load(f)
 
-    start = time.time()
+    # start = time.time()
     for idx, pinyin_sequence in enumerate(sys.stdin):
         ans = viterbi(
             pinyin_sequence,
@@ -404,13 +412,15 @@ def main():
             zhuyin,
         )
         print(ans)
-    end = time.time()
-    elapsed = end - start
-    print(f"测试耗时：{elapsed:.2f} 秒")
+    # end = time.time()
+    # elapsed = end - start
+    # print(f"测试耗时：{elapsed:.2f} 秒")
 
 
 if __name__ == "__main__":
+    # import sys
+    # m = float(sys.argv[1])
     main()
 
 # 1483.36
-# 3.93
+# 4.56
