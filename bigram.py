@@ -209,7 +209,7 @@ class Node:
 
 delta_word = 1e-7
 delta_char = 1e-10
-m = 0.80
+m = 0.89
 
 
 def viterbi(
@@ -232,7 +232,7 @@ def viterbi(
     dps = []
     for i in range(0, 50):
         dps.append([])
-    max_word_length = 4
+    max_word_length = 6
 
     # init
     append_cnt = 0
@@ -338,15 +338,15 @@ def viterbi(
 def main():
     corpus_folder_path = "./corpus/sina_news_gbk"
     # start = time.time()
-    # dictionary = get_pinyin()
+    dictionary = get_pinyin()
 
-    # char_cnt1, char_freq1 = char_process1(corpus_folder_path)
+    char_cnt1, char_freq1 = char_process1(corpus_folder_path)
 
-    # char_cnt2, char_freq2 = char_process2(corpus_folder_path, char_cnt1)
+    char_cnt2, char_freq2 = char_process2(corpus_folder_path, char_cnt1)
 
-    # word_cnt1, word_freq1, zhuyin = word_process1(corpus_folder_path)
+    word_cnt1, word_freq1, zhuyin = word_process1(corpus_folder_path)
 
-    # word_cnt2, word_freq2 = word_process2(corpus_folder_path, word_cnt1)
+    word_cnt2, word_freq2 = word_process2(corpus_folder_path, word_cnt1)
 
     # end = time.time()
     # elapsed = end - start
@@ -363,38 +363,38 @@ def main():
     # save_to_json(word_cnt2, "./saved_data/word_pair_count.json")
     # save_to_json(word_freq2, "./saved_data/word_pair_frequency.json")
 
-    data_path = "./saved_data/"
-    # 1. 拼音-汉字字典
-    with open(data_path + "pinyin_char_dict.json", "r", encoding="utf-8") as f:
-        dictionary = json.load(f)
+    # data_path = "./saved_data/"
+    # # 1. 拼音-汉字字典
+    # with open(data_path + "pinyin_char_dict.json", "r", encoding="utf-8") as f:
+    #     dictionary = json.load(f)
 
-    # 2. 一元字
-    with open(data_path + "char_count.json", "r", encoding="utf-8") as f:
-        char_cnt1 = json.load(f)
-    with open(data_path + "char_frequency.json", "r", encoding="utf-8") as f:
-        char_freq1 = json.load(f)
+    # # 2. 一元字
+    # with open(data_path + "char_count.json", "r", encoding="utf-8") as f:
+    #     char_cnt1 = json.load(f)
+    # with open(data_path + "char_frequency.json", "r", encoding="utf-8") as f:
+    #     char_freq1 = json.load(f)
 
-    # 3. 二元字
-    with open(data_path + "char_pair_count.json", "r", encoding="utf-8") as f:
-        char_cnt2 = json.load(f)
-    with open(data_path + "char_pair_frequency.json", "r", encoding="utf-8") as f:
-        char_freq2 = json.load(f)
+    # # 3. 二元字
+    # with open(data_path + "char_pair_count.json", "r", encoding="utf-8") as f:
+    #     char_cnt2 = json.load(f)
+    # with open(data_path + "char_pair_frequency.json", "r", encoding="utf-8") as f:
+    #     char_freq2 = json.load(f)
 
-    # 4. 一元词
-    with open(data_path + "word_count.json", "r", encoding="utf-8") as f:
-        word_cnt1 = json.load(f)
-    with open(data_path + "word_frequency.json", "r", encoding="utf-8") as f:
-        word_freq1 = json.load(f)
+    # # 4. 一元词
+    # with open(data_path + "word_count.json", "r", encoding="utf-8") as f:
+    #     word_cnt1 = json.load(f)
+    # with open(data_path + "word_frequency.json", "r", encoding="utf-8") as f:
+    #     word_freq1 = json.load(f)
 
-    # 5. 拼音-词语映射
-    with open(data_path + "pinyin_word_dict.json", "r", encoding="utf-8") as f:
-        zhuyin = json.load(f)
+    # # 5. 拼音-词语映射
+    # with open(data_path + "pinyin_word_dict.json", "r", encoding="utf-8") as f:
+    #     zhuyin = json.load(f)
 
-    # 6. 二元词
-    with open(data_path + "word_pair_count.json", "r", encoding="utf-8") as f:
-        word_cnt2 = json.load(f)
-    with open(data_path + "word_pair_frequency.json", "r", encoding="utf-8") as f:
-        word_freq2 = json.load(f)
+    # # 6. 二元词
+    # with open(data_path + "word_pair_count.json", "r", encoding="utf-8") as f:
+    #     word_cnt2 = json.load(f)
+    # with open(data_path + "word_pair_frequency.json", "r", encoding="utf-8") as f:
+    #     word_freq2 = json.load(f)
 
     # start = time.time()
     for idx, pinyin_sequence in enumerate(sys.stdin):
@@ -423,4 +423,4 @@ if __name__ == "__main__":
     main()
 
 # 1483.36
-# 4.56
+# 4.36

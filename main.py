@@ -118,7 +118,6 @@ def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
     dp_init = []
     if pinyin_sequence[0] not in dictionary:
         return None
-        #!
     for word in dictionary.get(pinyin_sequence[0]):
         if word in freq1.keys():
             dp_init.append(
@@ -134,7 +133,6 @@ def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
     for i in range(1, len(pinyin_sequence)):
         dp = []
         if pinyin_sequence[i] not in dictionary:
-            #! TODO：
             return None
         for character2 in dictionary.get(pinyin_sequence[i]):
             if character2 not in freq1:
@@ -183,15 +181,15 @@ def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
 def main():
     # start = time.time()
     dictionary = pinyin()
-    # corpus_folder_path = "./corpus/sina_news_gbk"
-    # cnt1, freq1 = word_process1(corpus_folder_path)
+    corpus_folder_path = "./corpus/sina_news_gbk"
+    cnt1, freq1 = word_process1(corpus_folder_path)
     # temp_saving_path = "./word_cnt1.json"
     # with open(temp_saving_path, "w", encoding="utf-8") as f:
     #     json.dump(cnt1, f, ensure_ascii=False, indent=4)
     # temp_saving_path = "./word_freq1.json"
     # with open(temp_saving_path, "w", encoding="utf-8") as f:
     #     json.dump(freq1, f, ensure_ascii=False, indent=4)
-    # cnt2, freq2 = word_process2(corpus_folder_path, cnt1)
+    cnt2, freq2 = word_process2(corpus_folder_path, cnt1)
     # temp_saving_path = "./word_cnt2.json"
     # with open(temp_saving_path, "w", encoding="utf-8") as f:
     #     json.dump(cnt2, f, ensure_ascii=False, indent=4)
@@ -202,17 +200,16 @@ def main():
     # end = time.time()
     # elapsed= end - start
     # print(f"初始化耗时：{elapsed:.2f} 秒")
-    # print(sys.getsizeof(freq1))
-    # print(sys.getsizeof(freq2))
+ 
 
-    with open("./word_freq1.json", "r", encoding="utf-8") as f:
-        freq1 = json.load(f)
-    with open("./word_freq2.json", "r", encoding="utf-8") as f:
-        freq2 = json.load(f)
-    with open("./word_cnt1.json", "r", encoding="utf-8") as f:
-        cnt1 = json.load(f)
-    with open("./word_cnt2.json", "r", encoding="utf-8") as f:
-        cnt2 = json.load(f)
+    # with open("./word_freq1.json", "r", encoding="utf-8") as f:
+    #     freq1 = json.load(f)
+    # with open("./word_freq2.json", "r", encoding="utf-8") as f:
+    #     freq2 = json.load(f)
+    # with open("./word_cnt1.json", "r", encoding="utf-8") as f:
+    #     cnt1 = json.load(f)
+    # with open("./word_cnt2.json", "r", encoding="utf-8") as f:
+    #     cnt2 = json.load(f)
     # start = time.time()
     for idx, pinyin_sequence in enumerate(sys.stdin):
         ans = viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1)
