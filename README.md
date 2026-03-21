@@ -1,6 +1,6 @@
 # Viterbi
 ## 环境依赖
-在运行前，请先安装项目所需依赖包，确保语料库和input文件都在正确位置情况：
+在运行前，请先安装项目所需依赖包，确保语料库和input文件都在正确位置：
 ```bash
 pip install -r requirements.txt
 ```
