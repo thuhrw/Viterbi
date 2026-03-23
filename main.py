@@ -144,6 +144,7 @@ def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
             for node in dps[i - 1]:
                 character1 = node.character
                 query = character1 + " " + character2
+                # 如果有二字组合共现的统计数据，则使用二字组合的概率，否则使用平滑参数
                 if query in freq2:
                     # probaccu = node.probaccu * (m * freq2[query] +(1-m) * freq1[character2])
                     probaccu = node.probaccu * freq2[query]

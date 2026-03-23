@@ -267,6 +267,7 @@ def viterbi(
                     for node in dps[idx - 1]:
                         character1 = node.character
                         query = character1 + " " + character2
+                        # 如果有二词组合共现的统计数据，则使用二词组合的概率，否则使用平滑参数
                         if query in word_freq2:
                             prob = node.prob * (
                                 m * word_freq2[query] + (1 - m) * word_freq1[character2]
@@ -295,6 +296,7 @@ def viterbi(
                 for node in dps[idx - 1]:
                     character1 = node.character[-1]
                     query = character1 + " " + character2
+                    # 如果有二字组合共现的统计数据，则使用二字组合的概率，否则使用平滑参数
                     if query in char_freq2:
                         prob = node.prob * (
                             m * char_freq2[query] + (1 - m) * char_freq1[character2]
