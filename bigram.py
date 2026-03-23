@@ -151,7 +151,7 @@ def word_process1(path: str):
 
     zhuyin = {}
     for word in word_count:
-        pinylist = lazy_pinyin(word)
+        pinylist = lazy_pinyin(word)  # 使用pypinyin库获取词语的拼音列表，不带音调
         piny = pinylist[0]
         for i in range(1, len(pinylist)):
             piny += " " + pinylist[i]
@@ -207,8 +207,8 @@ class Node:
         self.prev = prev
 
 
-delta_word = 1e-7
-delta_char = 1e-10
+delta_word = 1e-7  # 对词的平滑参数，避免概率为0导致的乘积为0问题
+delta_char = 1e-10  # 对字的平滑参数，避免概率为0导致的乘积为0问题
 m = 0.89
 
 
@@ -231,7 +231,7 @@ def viterbi(
     length = len(pinyin_sequence)
     dps = []
     for i in range(0, 50):
-        dps.append([])
+        dps.append([])  # 观察输入测例没有超过50的，所以选择这个数值
     max_word_length = 6
 
     # init
@@ -246,6 +246,7 @@ def viterbi(
             for item in zhuyin[word_pinyin]:
                 dps[len(item) - 1].append(Node(item, word_freq1[item], None))
                 append_cnt += 1
+    # fallback 到单字
     if dps[0] == []:
         for word in dictionary.get(pinyin_sequence[0]):
             if word in char_freq1.keys():
@@ -283,8 +284,8 @@ def viterbi(
 
                     dps[idx + len(character2) - 1].append(
                         Node(character2, max_prob, prev_node)
-                    )
-
+                    )  # 存储在最后一个音对应的列表中
+        # fallback到二字模型
         if dps[idx] == []:
             for character2 in dictionary.get(pinyin_sequence[idx]):
                 if character2 not in char_freq1:
@@ -315,6 +316,8 @@ def viterbi(
                         prev_node,
                     )
                 )
+
+    # 回溯，寻找整体概率最大的序列
     ans_node = None
     max_prob = -1e10
     tail = 49

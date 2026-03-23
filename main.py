@@ -101,12 +101,12 @@ def word_process2(path: str, cnt1):
 class Node:
     def __init__(self, character, prob=0.0, probaccu=0.0, prev=None):
         self.character = character
-        self.prob = prob
-        self.probaccu = probaccu
+        self.prob = prob  # 单字的概率，冗余设计，但是懒于删除了
+        self.probaccu = probaccu  # 从起点到当前节点的累计概率
         self.prev = prev
 
 
-delta = 1e-10
+delta = 1e-10  # 自定义的平滑参数，避免概率为0导致的乘积为0问题
 # m = 0.87
 
 
@@ -130,6 +130,8 @@ def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
             )
 
     dps.append(dp_init)
+    # 初始化
+
     for i in range(1, len(pinyin_sequence)):
         dp = []
         if pinyin_sequence[i] not in dictionary:
@@ -163,6 +165,8 @@ def viterbi(pinyin_sequence, dictionary, freq1, freq2, cnt1):
                 )
             )
         dps.append(dp)
+
+    # 回溯，寻找整体概率最大的序列
     ans_node = None
     max_prob = -1e10
     for node in dps[-1]:
@@ -200,7 +204,6 @@ def main():
     # end = time.time()
     # elapsed= end - start
     # print(f"初始化耗时：{elapsed:.2f} 秒")
- 
 
     # with open("./word_freq1.json", "r", encoding="utf-8") as f:
     #     freq1 = json.load(f)
